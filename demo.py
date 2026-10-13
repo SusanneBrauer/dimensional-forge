@@ -55,6 +55,19 @@ def user_sample_reset_check():
 if __name__ == "__main__":
     database.create_tables()
     user_sample_reset_check()
-    display_all_current_stacks()
-    load_current_revision_of_selected_stack()
+    stop_program = False
+    while not stop_program:
+        print("MENU")
+        print("-"*40)
+        print("1 - Display current Tolerance Stacks")
+        print("q - Quit program")
+        user_menu_input = input("What would you like to do?").strip().lower()
+        if user_menu_input == "1":
+            display_all_current_stacks()
+            load_current_revision_of_selected_stack()
+        elif user_menu_input == "q":
+            stop_program = True
+            input("Good Bye!")
+        else:
+            print("You did not enter a valid option. Please try again.")
     database.connection.close()
