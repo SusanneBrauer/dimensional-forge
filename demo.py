@@ -2,7 +2,7 @@ import os
 os.environ["FORGE_DB_PATH"] = "sample_digital_twin.db"
 
 import database
-from models import load_tolerance_stack, load_all_current_part_requirements
+from models import load_tolerance_stack, load_all_current_part_requirements, load_vehicle_requirement
 from build_sample_db import build_sample_db
 
 def get_current_stack_ids() -> list[str]:
@@ -34,8 +34,9 @@ def load_current_revision_of_selected_stack():
 
         active_stack = load_tolerance_stack(stack_id= requested_stack_id, status= "current")
 
-        print(f"\nSelected Stack: {active_stack.id} Rev {active_stack.revision} - status: {active_stack.    life_cycle_status}")
+        print(f"\nSelected Stack: {active_stack.id} Rev {active_stack.revision} - status: {active_stack.life_cycle_status}")
         print(f"Result: ±{active_stack.stack_result():.2f}")
+        print(f"Target: {active_stack.target.id} Rev {active_stack.target.revision}")
         if active_stack.target_validation():
             print(f"Target met - Target usage: {active_stack.target_usage():.2f}%")
         else:
@@ -43,6 +44,7 @@ def load_current_revision_of_selected_stack():
         for contributor in active_stack.contributors:
             print(f"{contributor.id} Rev {contributor.revision} - {contributor.description} - ±{contributor.half_range:.2f}")
         print(f"Are these contributors up to date: {active_stack.inputs_are_current(load_all_current_part_requirements())}")
+        print(f"Target is up to date: {active_stack.target_is_current()}")
 
 def user_sample_reset_check():
     user_reset_request = input("Would you like to rebuild the initial sample database?\nWARNING:A reset will DELETE all the current database content and create a set of NEW sample data.\nIf you want to reset the database to its initial sample state enter 'y'. ").strip().lower()
