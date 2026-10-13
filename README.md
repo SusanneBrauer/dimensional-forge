@@ -17,6 +17,7 @@ Input tolerance ranges can be centred as well as biased. Biased Tolerance values
 - tolerances stacks and requirements preserve previous revisions
 - the working assumption is not overwritten automatically they have to be promoted or disregarded (disregarded changes are preserved as such)
 ## Running
+- **Python needs to be installed** *(tested in Python 3.14)*
 - run `python demo.py` from the project folder
 - enter `y` to rebuild the sample data or hit `Enter` to retain the existing dataset
 - **on the first run:** enter `y` to create the sample data
