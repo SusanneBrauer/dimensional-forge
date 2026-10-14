@@ -268,7 +268,8 @@ if __name__ == "__main__":
         elif user_menu_input == "2":
             display_all_current_part_requirements()
             active_requirement = load_selected_part_requirement()
-            update_selected_requirement(active_requirement)
+            if active_requirement:
+                update_selected_requirement(active_requirement)
         elif user_menu_input =="3":
             display_all_current_vehicle_requirements()
             load_selected_vehicle_requirement()
