@@ -353,7 +353,7 @@ def display_all_current_vehicle_requirements() -> None:
 def load_selected_vehicle_requirement():
     current_vehicle_requirement_ids = get_current_vehicle_requirement_ids()
     if not current_vehicle_requirement_ids:
-        print("There are no part requirements in the system.")
+        print("There are no vehicle requirements in the system.")
     else:
         valid_requirement_id = False
 
@@ -381,6 +381,14 @@ def user_sample_reset_check():
     if user_reset_request == "y":
         build_sample_db()
 
+def display_stacks_to_review() -> None:
+    print("THESE TOLERANCE STACKS NEED TO BE REVIEWED:")
+    if len(database.get_tolerance_stacks_to_review()) > 0:
+        for row in database.get_tolerance_stacks_to_review():
+            print(f"{row["id"]} Rev {row["revision"]} - {row["description"]} | Status: {row["life_cycle_status"]}")
+    else:
+        print("There are currently no tolerance stacks that need to be reviewed.")
+
 if __name__ == "__main__":
     database.create_tables()
     user_sample_reset_check()
@@ -389,19 +397,22 @@ if __name__ == "__main__":
         print("\nMENU")
         print("-"*40)
         print("1 - Display current Tolerance Stacks")
-        print("2 - Display Part Requirements")
-        print("3 - Display Vehicle Requirements")
+        print("2 - Display Tolerance Stacks that need to be reviewed")
+        print("3 - Display Part Requirements")
+        print("4 - Display Vehicle Requirements")
         print("q - Quit program")
         user_menu_input = input("What would you like to do? ").strip().lower()
         if user_menu_input == "1":
             display_all_current_stacks()
             load_current_revision_of_selected_stack()
         elif user_menu_input == "2":
+            display_stacks_to_review()
+        elif user_menu_input == "3":
             display_all_current_part_requirements()
             active_requirement = load_selected_part_requirement()
             if active_requirement:
                 update_selected_part_requirement(active_requirement)
-        elif user_menu_input =="3":
+        elif user_menu_input =="4":
             display_all_current_vehicle_requirements()
             active_requirement = load_selected_vehicle_requirement()
             if active_requirement:
