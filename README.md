@@ -21,7 +21,10 @@ Input tolerance ranges can be centred as well as biased. Biased Tolerance values
 - run `python demo.py` from the project folder (When running in Windows: If `python` isn't recognised, try `py demo.py`)
 - enter `y` to rebuild the sample data or hit `Enter` to retain the existing dataset
 - **on the first run:** enter `y` to create the sample data
-- select a tolerance stack by entering its ID or enter `q` to quit the selection
+- in the main menu select: current tolerance stacks, existing review items, part requirements and vehicle requirements. Enter the number for the relevant option or `q` to exit
+- select tolerance stacks, part requirements and vehicle requirements by entering the respective IDs or enter `q` to return to the main menu
+- selected requirements can be updated when entering `y`
+- in the update menu chose the updates you want to make by entering the respective numbers and confirm the updates by entering `f` or cancel it by entering `q`
 
 ## Sample Data
 The sample data set currently contains two scenarios:

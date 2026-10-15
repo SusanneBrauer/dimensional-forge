@@ -79,8 +79,8 @@ def build_sample_db():
         system= "Front",
         description= "Front bumper-to-headlamp gap",
         nominal= 3.0,
-        upper_tol_limit= 0.8,
-        lower_tol_limit= -0.8,
+        upper_limit= 0.8,
+        lower_limit= -0.8,
         log_comment= "1st sample vehicle requirement"
     ).save_vehicle_requirement()
 
@@ -104,8 +104,8 @@ def build_sample_db():
         system= "Front",
         description= "Front bumper-to-headlamp tighter gap demonstration",
         nominal= 3.0,
-        upper_tol_limit= 0.5,
-        lower_tol_limit= -0.5,
+        upper_limit= 0.5,
+        lower_limit= -0.5,
         log_comment= "tighter sample vehicle requirement"
     ).save_vehicle_requirement()
 
