@@ -42,6 +42,9 @@ class PartRequirement:
     def lower_boundary(self) -> float:
         return self.nominal + self.lower_limit
     def save_part_requirement(self) -> None:
+        datum_list = self.datums.copy()
+        while len(datum_list) < 3:
+            datum_list.append(None)
         cursor = connection.cursor()
         cursor.execute("""
             INSERT INTO part_requirements (
@@ -68,9 +71,9 @@ class PartRequirement:
                 self.nominal,
                 self.upper_limit,
                 self.lower_limit,
-                self.datums[0],
-                self.datums[1],
-                self.datums[2],
+                datum_list[0],
+                datum_list[1],
+                datum_list[2],
                 self.log
             )
         )

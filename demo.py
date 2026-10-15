@@ -101,7 +101,7 @@ def update_selected_requirement(active_requirement) -> None:
                         update_details["description"] = user_input
 
                 case "2":
-                    if not update_details["nominal"]:
+                    if update_details["nominal"] is None:
                         user_input = input(f"Current NOMINAL: {active_requirement.nominal}\nWhat do you want to change it to? If you don't want to make any changes to this detail enter 'q'.\n").strip()
                     else:
                         user_input = input(f"Current NOMINAL: {active_requirement.nominal}\nCurrently to be updated to: {update_details["nominal"]}\nWhat do you want to change it to? If you don't want to make any changes to this detail enter 'q'.\n").strip()
@@ -111,10 +111,13 @@ def update_selected_requirement(active_requirement) -> None:
                         update_details["nominal"] = None
                         print("you made no entry and the field can not be empty. No update value stored.")
                     else:
-                        update_details["nominal"] = float(user_input)
+                        try:
+                            update_details["nominal"] = float(user_input)
+                        except ValueError:
+                            print("Please enter a numerical value to change the nominal.")
 
                 case "3":
-                    if not update_details["upper_limit"]:
+                    if update_details["upper_limit"] is None:
                         user_input = input(f"Current UPPER TOLERANCE LIMIT: {active_requirement.upper_limit}\nWhat do you want to change it to? If you don't want to make any changes to this detail enter 'q'.\n").strip()
                     else:
                         user_input = input(f"Current UPPER TOLERANCE LIMIT: {active_requirement.upper_limit}\nCurrently to be updated to: {update_details["upper_limit"]}\nWhat do you want to change it to? If you don't want to make any changes to this detail enter 'q'.\n").strip()
@@ -124,10 +127,13 @@ def update_selected_requirement(active_requirement) -> None:
                         update_details["upper_limit"] = None
                         print("you made no entry and the field can not be empty. No update value stored.")
                     else:
-                        update_details["upper_limit"] = float(user_input)
+                        try:
+                            update_details["upper_limit"] = float(user_input)
+                        except ValueError:
+                            print("Please enter a numerical value to change the upper tolerance limit.")
 
                 case "4":
-                    if not update_details["lower_limit"]:
+                    if update_details["lower_limit"] is None:
                         user_input = input(f"Current LOWER TOLERANCE LIMIT: {active_requirement.lower_limit}\nWhat do you want to change it to? If you don't want to make any changes to this detail enter 'q'.\n").strip()
                     else:
                         user_input = input(f"Current LOWER TOLERANCE LIMIT: {active_requirement.lower_limit}\nCurrently to be updated to: {update_details["lower_limit"]}\nWhat do you want to change it to? If you don't want to make any changes to this detail enter 'q'.\n").strip()
@@ -137,7 +143,10 @@ def update_selected_requirement(active_requirement) -> None:
                         update_details["lower_limit"] = None
                         print("you made no entry and the field can not be empty. No update value stored.")
                     else:
-                        update_details["lower_limit"] = float(user_input)
+                        try:
+                            update_details["lower_limit"] = float(user_input)
+                        except ValueError:
+                            print("Please enter a numerical value to change the lower tolerance limit.")
 
                 case "5":
                     if not update_details["datums"]:
@@ -176,15 +185,18 @@ def update_selected_requirement(active_requirement) -> None:
                         update_details["log_comment"] = user_input
 
                 case "f":
-                    active_requirement.update(
-                        update_details["description"],
-                        update_details["nominal"],
-                        update_details["upper_limit"],
-                        update_details["lower_limit"],
-                        update_details["datums"],
-                        update_details["log_comment"]
-                    )
-                    update_finished = True
+                    if all(entry is None for entry in update_details.values()):
+                        print("You staged no changes to update. Please enter the values you want to update or enter 'q' to cancel the update.")
+                    else:
+                        active_requirement.update(
+                            update_details["description"],
+                            update_details["nominal"],
+                            update_details["upper_limit"],
+                            update_details["lower_limit"],
+                            update_details["datums"],
+                            update_details["log_comment"]
+                        )
+                        update_finished = True
 
                 case "q":
                     print("update cancelled")
