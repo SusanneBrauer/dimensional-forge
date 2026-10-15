@@ -162,7 +162,7 @@ def update_selected_requirement(active_requirement) -> None:
                         update_details["datums"] = [user_input_primary.upper()]
                         user_input_secondary = input("Enter the updated secondary datum or enter 'q' to cancel and update to only a primary datum: ").strip()
                         if user_input_secondary.lower() == "q" or user_input_secondary == "":
-                            update_details["datums"] = update_details["datums"]
+                            update_details ["datums"] = update_details["datums"]
                         else:
                             update_details["datums"].append(user_input_secondary.upper())
                             user_input_tertiary = input("Enter the updated tertiary datum, hit enter if there should be no tertiary datum or enter 'q' to cancel and update to only a primary datum and secondary datum: ").strip()
@@ -252,7 +252,7 @@ def load_selected_vehicle_requirement():
 
         print(f"\nSelected: {active_requirement.id} Rev {active_requirement.revision} - {active_requirement.description}")
         print(f"Program: {active_requirement.program} | System: {active_requirement.system}")
-        print(f"Nominal: {active_requirement.nominal} | Upper Limit: {active_requirement.upper_tol_limit} | Lower Limit: {active_requirement.lower_tol_limit}")
+        print(f"Nominal: {active_requirement.nominal} | Upper Limit: {active_requirement.upper_limit} | Lower Limit: {active_requirement.lower_limit}")
 
         return active_requirement
 

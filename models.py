@@ -119,8 +119,8 @@ class VehicleRequirement:
         system: str,
         description: str,
         nominal: float,
-        upper_tol_limit: float,
-        lower_tol_limit: float,
+        upper_limit: float,
+        lower_limit: float,
         log_comment: str,
     ):
         self.id = id
@@ -129,15 +129,15 @@ class VehicleRequirement:
         self.system = system
         self.description = description
         self.nominal = nominal
-        self.upper_tol_limit = upper_tol_limit
-        self.lower_tol_limit = lower_tol_limit
+        self.upper_limit = upper_limit
+        self.lower_limit = lower_limit
         self.log = log_comment
     def tolerance_range(self) -> float:
-        return self.upper_tol_limit - self.lower_tol_limit
+        return self.upper_limit - self.lower_limit
     def upper_boundary(self) -> float:
-        return self.nominal + self.upper_tol_limit
+        return self.nominal + self.upper_limit
     def lower_boundary(self) -> float:
-        return self.nominal + self.lower_tol_limit
+        return self.nominal + self.lower_limit
     def save_vehicle_requirement(self) -> None:
         cursor = connection.cursor()
         cursor.execute("""
@@ -160,8 +160,8 @@ class VehicleRequirement:
                 self.system,
                 self.description,
                 self.nominal,
-                self.upper_tol_limit,
-                self.lower_tol_limit,
+                self.upper_limit,
+                self.lower_limit,
                 self.log
             )
         )
@@ -184,11 +184,11 @@ class VehicleRequirement:
             new_revision.nominal = nominal
             new_revision.log += f"Rev {self.revision} nominal: {self.nominal} to Rev {new_revision.revision} nominal: {new_revision.nominal}\n"
         if upper_limit is not None:
-            new_revision.upper_tol_limit = upper_limit
-            new_revision.log += f"Rev {self.revision} upper_limit: {self.upper_tol_limit} to Rev {new_revision.revision} upper_limit: {new_revision.upper_tol_limit}\n"
+            new_revision.upper_limit = upper_limit
+            new_revision.log += f"Rev {self.revision} upper_limit: {self.upper_limit} to Rev {new_revision.revision} upper_limit: {new_revision.upper_limit}\n"
         if lower_limit is not None:
-            new_revision.lower_tol_limit = lower_limit
-            new_revision.log += f"Rev {self.revision} lower_limit: {self.lower_tol_limit} to Rev {new_revision.revision} lower_limit: {new_revision.lower_tol_limit}\n"
+            new_revision.lower_limit = lower_limit
+            new_revision.log += f"Rev {self.revision} lower_limit: {self.lower_limit} to Rev {new_revision.revision} lower_limit: {new_revision.lower_limit}\n"
         if log_comment is not None:
             new_revision.log += log_comment
         new_revision.save_vehicle_requirement()
@@ -651,8 +651,8 @@ def load_vehicle_requirement(requirement_id: str) -> VehicleRequirement:
         system= row["system"],
         description= row["description"],
         nominal= row["nominal"],
-        upper_tol_limit= row["upper_limit"],
-        lower_tol_limit= row["lower_limit"],
+        upper_limit= row["upper_limit"],
+        lower_limit= row["lower_limit"],
         log_comment= row["log_comment"]
     )
     return loaded_requirement
@@ -670,8 +670,8 @@ def load_rev_of_vehicle_requirement(requirement_id:str, revision: int):
         system= row["system"],
         description= row["description"],
         nominal= row["nominal"],
-        upper_tol_limit= row["upper_limit"],
-        lower_tol_limit= row["lower_limit"],
+        upper_limit= row["upper_limit"],
+        lower_limit= row["lower_limit"],
         log_comment= row["log_comment"]
     )
     return loaded_requirement
@@ -744,8 +744,8 @@ def load_all_current_vehicle_requirements() -> list[VehicleRequirement]:
             system= row["system"],
             description= row["description"],
             nominal= row["nominal"],
-            upper_tol_limit= row["upper_limit"],
-            lower_tol_limit= row["lower_limit"],
+            upper_limit= row["upper_limit"],
+            lower_limit= row["lower_limit"],
             log_comment= row["log_comment"],
         )
         current_vehicle_requirements.append(requirement)
