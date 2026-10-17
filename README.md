@@ -12,7 +12,7 @@ Input tolerance ranges can be centred as well as biased. Biased Tolerance values
 - add part requirements to tolerance stacks
 - update and create a new revision stack when part requirements change
 - tolerance stack have different life cycle states: `wip`, `current`, `pending review`, `superseded` and `disregarded`
-- review workflow: `accept` and `disregard` pending stacks currently running through python methods *demo menu support planned*
+- review workflow: `accept` and `disregard` pending stacks currently running through python methods
 - tolerance stack produce RSS calculation and compare the result to the target (percentage of target use provided as well)
 - tolerances stacks and requirements preserve previous revisions
 - the working assumption is not overwritten automatically they have to be promoted or disregarded (disregarded changes are preserved as such)
@@ -21,7 +21,7 @@ Input tolerance ranges can be centred as well as biased. Biased Tolerance values
 - run `python demo.py` from the project folder (When running in Windows: If `python` isn't recognised, try `py demo.py`)
 - enter `y` to rebuild the sample data or hit `Enter` to retain the existing dataset
 - **on the first run:** enter `y` to create the sample data
-- in the main menu select: current tolerance stacks, existing review items, part requirements and vehicle requirements. Enter the number for the relevant option or `q` to exit
+- in the main menu select: current tolerance stacks, current review items, part requirements and vehicle requirements. Enter the number for the relevant option or `q` to exit
 - select tolerance stacks, part requirements and vehicle requirements by entering the respective IDs or enter `q` to return to the main menu
 - selected requirements can be updated when entering `y`
 - in the update menu chose the updates you want to make by entering the respective numbers and confirm the updates by entering `f` or cancel it by entering `q`

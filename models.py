@@ -676,14 +676,20 @@ def load_rev_of_vehicle_requirement(requirement_id:str, revision: int):
     )
     return loaded_requirement
 
-def load_tolerance_stack(stack_id: str, status: Literal["current", "latest"] = "latest") -> ToleranceStack:
+def load_tolerance_stack(stack_id: str, status: Literal["current", "latest", "revision"] = "latest", revision: int | None = None) -> ToleranceStack:
     if status == "current":
         row = get_current_tolerance_stack(stack_id)
     elif status == "latest":
         row = get_latest_tolerance_stack_revision(stack_id)
+    elif status == "revision":
+        row = get_revision_of_stack(stack_id, revision)
+        if revision is None:
+            raise ValueError(
+                "Revision number required."
+            )
     else:
         raise ValueError(
-            f"Unsupported stack status {status!r}. Use 'current' or 'latest'."
+            f"Unsupported stack status {status!r}. Use 'current', 'latest' or 'revision'."
         )
     if row is None:
         raise LookupError(

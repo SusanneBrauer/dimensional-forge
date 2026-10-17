@@ -389,6 +389,21 @@ def display_stacks_to_review() -> None:
     else:
         print("There are currently no tolerance stacks that need to be reviewed.")
 
+def check_for_stack_updates():
+    current_part_requirements = load_all_current_part_requirements()
+    for id in get_current_stack_ids():
+        pending_revision = database.get_latest_revision_of_stack_pending_review(id)
+        if pending_revision is None:
+            load_tolerance_stack(id, "current").check_for_updates(current_part_requirements)
+        else:
+            pending_stack = load_tolerance_stack(id, "revision", pending_revision)
+            update_pending = pending_stack.check_for_updates(current_part_requirements)
+            if update_pending is not None:
+                pending_stack.life_cycle_status = "superseded"
+                pending_stack.review_required = False
+                pending_stack.update_stack()
+
+
 if __name__ == "__main__":
     database.create_tables()
     user_sample_reset_check()
@@ -406,6 +421,7 @@ if __name__ == "__main__":
             display_all_current_stacks()
             load_current_revision_of_selected_stack()
         elif user_menu_input == "2":
+            check_for_stack_updates()
             display_stacks_to_review()
         elif user_menu_input == "3":
             display_all_current_part_requirements()

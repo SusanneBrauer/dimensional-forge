@@ -210,6 +210,17 @@ def get_all_current_stacks():
     """)
     return cursor.fetchall()
 
+def get_latest_revision_of_stack_pending_review(stack_id) -> int | None:
+    cursor.execute("""
+        SELECT MAX(revision) as revision
+        FROM tolerance_stacks
+        WHERE id= ? AND life_cycle_status = "pending review"
+    """, (stack_id,)
+    )
+    result = cursor.fetchone()
+
+    return result["revision"]
+
 connection.commit()
 
 if __name__ == "__main__":
