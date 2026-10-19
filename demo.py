@@ -389,6 +389,58 @@ def display_stacks_to_review() -> None:
     else:
         print("There are currently no tolerance stacks that need to be reviewed.")
 
+def check_for_stack_updates():
+    current_part_requirements = load_all_current_part_requirements()
+    for id in get_current_stack_ids():
+        pending_revision = database.get_latest_revision_of_stack_pending_review(id)
+        if pending_revision is None:
+            load_tolerance_stack(id, "current").check_for_updates(current_part_requirements)
+        else:
+            pending_stack = load_tolerance_stack(id, "revision", pending_revision)
+            update_pending = pending_stack.check_for_updates(current_part_requirements)
+            if update_pending is not None:
+                pending_stack.life_cycle_status = "superseded"
+                pending_stack.review_required = False
+                pending_stack.update_stack()
+
+def review_selected_pending_stack():
+    while True:
+        user_input = input("Which tolerance stack would you like to review? If you want to return to the menu enter 'q'.\n").strip()
+        if user_input.lower() == "q":
+            print("Returning to menu.")
+            return
+        else:
+            review_revision = database.get_latest_revision_of_stack_pending_review(user_input)
+            if review_revision is not None:
+                review_stack = load_tolerance_stack(user_input, "revision", review_revision)
+                print(f"Reviewing Tolerance Stack: {review_stack.id} Rev {review_stack.revision} - {review_stack.description}")
+                print(f"Target: ±{review_stack.target.half_range:.2f}mm | Result: ±{review_stack.stack_result():.2f}mm | Target usage: {review_stack.target_usage():.2f}%")
+                for contributor in review_stack.contributors:
+                    print(f"{contributor.id} Rev {contributor.revision} - {contributor.description} | ±{contributor.half_range}")
+                break
+            else:
+                print("There is no tolerance stack to review with this ID. Please Try again.")
+    print("\nREVIEW ACTIONS:")
+    print("1 - Accept")
+    print("2 - Disregard")
+    print("q - Cancel review")
+
+    while True:
+        review_action = input("How do you want to proceed with this tolerance stack? ").strip()
+        if review_action == "1":
+            remark = input("Please enter a comment to accept this update.\n")
+            review_stack.accept(remark)
+            break
+        elif review_action == "2":
+            remark = input("Please enter a comment to disregard this update.\n")
+            review_stack.disregard(remark)
+            break
+        elif review_action.lower() == "q":
+            print(f"Review for {review_stack.id} was cancelled.")
+            break
+        else:
+            print("You did not enter a valid option. Please try again.")
+
 if __name__ == "__main__":
     database.create_tables()
     user_sample_reset_check()
@@ -406,7 +458,9 @@ if __name__ == "__main__":
             display_all_current_stacks()
             load_current_revision_of_selected_stack()
         elif user_menu_input == "2":
+            check_for_stack_updates()
             display_stacks_to_review()
+            review_selected_pending_stack()
         elif user_menu_input == "3":
             display_all_current_part_requirements()
             active_requirement = load_selected_part_requirement()
