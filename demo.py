@@ -391,17 +391,19 @@ def display_stacks_to_review() -> None:
 
 def check_for_stack_updates():
     current_part_requirements = load_all_current_part_requirements()
+
     for id in get_current_stack_ids():
-        pending_revision = database.get_latest_revision_of_stack_pending_review(id)
-        if pending_revision is None:
-            load_tolerance_stack(id, "current").check_for_updates(current_part_requirements)
-        else:
-            pending_stack = load_tolerance_stack(id, "revision", pending_revision)
-            update_pending = pending_stack.check_for_updates(current_part_requirements)
-            if update_pending is not None:
-                pending_stack.life_cycle_status = "superseded"
-                pending_stack.review_required = False
-                pending_stack.update_stack()
+        current_stack = load_tolerance_stack(id, "current")
+        current_stack.check_target()
+        current_stack.update_stack()
+
+        latest_stack = load_tolerance_stack(id, "latest")
+        updated_stack = latest_stack.check_for_updates(current_part_requirements)
+
+        if updated_stack is not None and latest_stack.life_cycle_status == "pending review":
+            latest_stack.life_cycle_status = "superseded"
+            latest_stack.review_required = False
+            latest_stack.update_stack()
 
 def review_selected_pending_stack():
     while True:

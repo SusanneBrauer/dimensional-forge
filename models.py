@@ -35,12 +35,16 @@ class PartRequirement:
         self.lower_limit = lower_limit
         self.datums = datums
         self.log = log_comment
+
     def tolerance_range(self) -> float:
         return self.upper_limit - self.lower_limit
+
     def upper_boundary(self) -> float:
         return self.nominal + self.upper_limit
+
     def lower_boundary(self) -> float:
         return self.nominal + self.lower_limit
+
     def save_part_requirement(self) -> None:
         datum_list = self.datums.copy()
         while len(datum_list) < 3:
@@ -78,6 +82,7 @@ class PartRequirement:
             )
         )
         connection.commit()
+
     def update(
             self,
             description: str | None = None,
@@ -132,12 +137,16 @@ class VehicleRequirement:
         self.upper_limit = upper_limit
         self.lower_limit = lower_limit
         self.log = log_comment
+
     def tolerance_range(self) -> float:
         return self.upper_limit - self.lower_limit
+
     def upper_boundary(self) -> float:
         return self.nominal + self.upper_limit
+
     def lower_boundary(self) -> float:
         return self.nominal + self.lower_limit
+
     def save_vehicle_requirement(self) -> None:
         cursor = connection.cursor()
         cursor.execute("""
@@ -166,6 +175,7 @@ class VehicleRequirement:
             )
         )
         connection.commit()
+
     def update(
             self,
             description: str | None = None,
@@ -243,6 +253,7 @@ class ToleranceStack:
         self.validation_changed = False
         self.review_required = False
         self.review_remark = None
+
     def add_contributor(self, part_requirement: PartRequirement) -> None:
         contributor = StackContributor(
             part_requirement.id,
@@ -251,6 +262,7 @@ class ToleranceStack:
             part_requirement.tolerance_range()/2
         )
         self.contributors.append(contributor)
+
     def confirm_object_stored_and_at_wip(self) -> None:
         record = get_revision_of_stack(self.id, self.revision)
         if record is None:
@@ -261,6 +273,7 @@ class ToleranceStack:
             raise ValueError(
                 f"The record for {self.id} - rev {self.revision} is not stored as WIP"
             )
+
     def save_wip_changes(self):
         if self.life_cycle_status != "wip":
             raise ValueError(
@@ -295,6 +308,7 @@ class ToleranceStack:
                         None
                     )
                 )
+
     def wip_to_current(self) -> None:
         self.confirm_object_stored_and_at_wip()
         if not self.contributors:
@@ -310,6 +324,7 @@ class ToleranceStack:
                 WHERE id = ? AND revision = ?
             """, (self.id, self.revision))
         self.life_cycle_status = "current"
+
     def stack_result(self) -> float | str:
         if not self.contributors:
             return "Not calculated—no contributors"
@@ -317,26 +332,31 @@ class ToleranceStack:
         for contributor in self.contributors:
             square_sum += contributor.half_range * contributor.half_range
         return math.sqrt(square_sum)
+
     def contributors_by_range(self) -> list[StackContributor]:
         return sorted(
             self.contributors,
             key=lambda contributor: contributor.half_range,
             reverse=True
         )
+
     def target_validation(self) -> bool:
         if not self.contributors:
                     return "Not calculated—no contributors"
         return self.stack_result() <= self.target.half_range
+
     def validation_status(self) -> str:
         if not self.contributors:
             return "Not calculated—no contributors"
         if self.target_validation():
             return "Target Met"
         return "Target exceeded"
+
     def target_usage(self) -> float | str:
         if not self.contributors:
             return "Not calculated—no contributors"
         return (self.stack_result() / self.target.half_range) * 100
+
     def find_current_requirement(
         self,
         contributor: StackContributor,
@@ -349,6 +369,7 @@ class ToleranceStack:
             f"Part requirement {contributor.id} was not found "
             f"in the supplied current requirements for stack {self.id}."
         )
+
     def inputs_are_current(
             self,
             current_requirements: list
@@ -359,6 +380,7 @@ class ToleranceStack:
             if not contributor.revision == current_requirement.revision:
                 inputs_current = False
         return inputs_current
+
     def update_status(
             self,
             current_requirements: list
@@ -366,6 +388,7 @@ class ToleranceStack:
         if self.inputs_are_current(current_requirements):
             return "this is still the current official stack"
         return "one or more inputs have changed, so an updated calculation is pending"
+
     def changed_requirements(
         self,
         current_requirements: list
@@ -376,6 +399,7 @@ class ToleranceStack:
             if contributor.revision != current_requirement.revision:
                 updated_requirements.append(current_requirement)
         return updated_requirements
+
     def update_contributors(
         self,
         requirement: PartRequirement,
@@ -385,6 +409,7 @@ class ToleranceStack:
                 contributor.description = requirement.description
                 contributor.revision = requirement.revision
                 contributor.half_range = requirement.tolerance_range()/2
+
     def save_stack(self) -> None:
         cursor = connection.cursor()
         cursor.execute("""
@@ -431,6 +456,7 @@ class ToleranceStack:
                 )
             )
         connection.commit()
+
     def recalculate(
         self,
         current_requirements: list
@@ -444,10 +470,12 @@ class ToleranceStack:
         recalculated_stack.revision = latest_record["revision"] + 1
         recalculated_stack.life_cycle_status = "pending review"
         recalculated_stack.review_required = True
+        recalculated_stack.review_remark = None
         for requirement in recalculated_stack.changed_requirements(current_requirements):
             requirement_data = load_part_requirement(requirement.id)
             recalculated_stack.update_contributors(requirement_data)
         return recalculated_stack
+
     def check_inputs(
         self,
         current_requirements: list
@@ -455,6 +483,7 @@ class ToleranceStack:
         if self.inputs_are_current(current_requirements):
             return None
         return self.recalculate(current_requirements)
+
     def find_current_vehicle_requirement(self) -> sqlite3.Row:
         requirement = get_latest_vehicle_requirement(self.target.id)
         if requirement is None:
@@ -463,16 +492,19 @@ class ToleranceStack:
                 f"in the database for stack {self.id}."
             )
         return requirement
+
     def target_is_current(
         self,
     ) -> bool:
         target_requirement = self.find_current_vehicle_requirement()["revision"]
         return target_requirement == self.target.revision
+
     def update_target(self) -> None:
         target_requirement_row = self.find_current_vehicle_requirement()
         self.target.description = target_requirement_row["description"]
         self.target.revision = target_requirement_row["revision"]
         self.target.half_range = (target_requirement_row["upper_limit"]-target_requirement_row["lower_limit"])/2
+
     def revalidate_target(self):
         old_validation_status = self.validation_status()
         self.update_target()
@@ -482,6 +514,7 @@ class ToleranceStack:
             self.validation_changed = True
         else:
             self.validation_changed = False
+
     def update_stack(self) -> None:
         cursor = connection.cursor()
         cursor.execute(
@@ -508,10 +541,12 @@ class ToleranceStack:
             )
         )
         connection.commit()
+
     def check_target(self) -> str:
         if self.target_is_current():
             return "Target is current."
         return self.revalidate_target()
+
     def check_for_updates(
         self,
         current_requirements: list
@@ -524,6 +559,7 @@ class ToleranceStack:
         self.check_target()
         self.update_stack()
         return None
+
     def disregard(
         self,
         remark: str
@@ -542,6 +578,7 @@ class ToleranceStack:
         self.life_cycle_status = "disregarded"
         self.review_remark = remark
         self.review_required = False
+
     def supersede_current_stack(self) -> None:
         cursor = connection.cursor()
         cursor.execute(
@@ -553,6 +590,7 @@ class ToleranceStack:
                     id = ? AND life_cycle_status = "current"
             """, (self.id,)
         )
+
     def confirm_object_stored_and_pending_review(self) -> None:
         record = get_revision_of_stack(self.id, self.revision)
         if record is None:
@@ -563,6 +601,7 @@ class ToleranceStack:
             raise ValueError(
                 f"The record for {self.id} - rev {self.revision} is not stored as 'pending review'"
             )
+
     def accept(
         self,
         remark: str
@@ -582,11 +621,13 @@ class ToleranceStack:
         self.life_cycle_status = "current"
         self.review_remark = remark
         self.review_required = False
+
     def acknowledge_target_change(self) -> None:
         self.target_changed = False
         self.validation_changed = False
         self.review_required = False
         self.update_stack()
+
     def needs_review(self) -> bool:
         return self.review_required
 

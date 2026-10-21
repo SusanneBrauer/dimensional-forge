@@ -46,8 +46,7 @@ When a supplier or part owner update a part tolerance that was used in an existi
 The engineer loads the tolerance stack using the `load_tolerance_stack()` function and uses the `check_for_updates()` methods to check for updated inputs or targets and recalculate and/or re-evaluates the stack considering the updated requirements. And after reviewing any changes and promote or pass over the new revision with the methods `accept()` or `disregard()`.
 
 ## Known Limitations / Future Improvements
-- **Disregarded updates:** When a proposed tolerance stack revision is disregarded, subsequent update checks can rediscover the same underlying requirement changes and generate another revision.
-- **Planned improvement:** Refine the update detection process to recognise previously reviewed and disregarded changes, while still identifying genuinely new updates that require engineering review.
+- **Target-change visibility:** Add a list of stacks with changed targets, highlighting those whose validation status changed between “Target Met” and “Target exceeded”.
 
 ## File Map
 - `demo.py` - runs the user interactions
